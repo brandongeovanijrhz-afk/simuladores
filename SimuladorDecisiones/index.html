@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Ejecutivo Estratégico</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#1f2a38,#111822);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.06);
+backdrop-filter:blur(15px);
+padding:35px;
+border-radius:18px;
+width:100%;
+max-width:700px;
+box-shadow:0 25px 70px rgba(0,0,0,0.6);
+animation:fadeIn 1s ease;
+}
+
+h1{
+text-align:center;
+margin-bottom:15px;
+font-weight:600;
+}
+
+p{
+margin:15px 0;
+line-height:1.6;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+margin:8px 0;
+font-size:15px;
+cursor:pointer;
+transition:0.3s;
+font-weight:600;
+background:#2c3e50;
+color:white;
+}
+
+button:hover{
+transform:scale(1.02);
+background:#34495e;
+}
+
+.hidden{display:none;}
+
+.resultado{
+margin-top:20px;
+font-size:18px;
+font-weight:600;
+text-align:center;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>El Contrato Internacional</h1>
+
+<div id="inicio">
+<p>
+Tu empresa compite por un contrato millonario que definirá su futuro.
+Cada decisión construirá tu estrategia.
+No todas las decisiones correctas son evidentes.
+</p>
+<button onclick="iniciar()">Asumir Dirección General</button>
+</div>
+
+<div id="juego" class="hidden">
+<p id="historia"></p>
+<div id="opciones"></div>
+</div>
+
+<div id="final" class="hidden">
+<div class="resultado" id="resultado"></div>
+<button onclick="location.reload()">Reiniciar simulación</button>
+</div>
+
+</div>
+
+<script>
+
+let fase=0;
+let decisiones=[];
+
+const escenarios=[
+
+{
+texto:"Fase 1: Preparación interna. Tienes recursos limitados para adquirir bienes.",
+opciones:[
+{texto:"Invertir en fortalecer capacidades internas y procesos.",valor:"estructura"},
+{texto:"Invertir en imagen pública y relaciones estratégicas.",valor:"imagen"}
+]
+},
+
+{
+texto:"Fase 2: Posicionamiento frente al cliente internacional.",
+opciones:[
+{texto:"Presentar propuesta técnica sólida y detallada.",valor:"estructura"},
+{texto:"Presentar visión ambiciosa y proyección de crecimiento.",valor:"expansion"}
+]
+},
+
+{
+texto:"Fase 3: Surge una crisis mediática menor relacionada con tu sector.",
+opciones:[
+{texto:"Actuar con prudencia y transparencia inmediata.",valor:"estabilidad"},
+{texto:"Minimizar la situación para evitar impacto público.",valor:"riesgo"}
+]
+},
+
+{
+texto:"Fase 4: Negociación final del contrato.",
+opciones:[
+{texto:"Aceptar términos moderados asegurando estabilidad.",valor:"estabilidad"},
+{texto:"Negociar agresivamente buscando máxima ganancia.",valor:"expansion"}
+]
+}
+
+];
+
+function iniciar(){
+document.getElementById("inicio").classList.add("hidden");
+document.getElementById("juego").classList.remove("hidden");
+mostrarFase();
+}
+
+function mostrarFase(){
+let escena=escenarios[fase];
+document.getElementById("historia").textContent=escena.texto;
+
+let opcionesHTML="";
+escena.opciones.forEach(op=>{
+opcionesHTML+=`<button onclick="elegir('${op.valor}')">${op.texto}</button>`;
+});
+
+document.getElementById("opciones").innerHTML=opcionesHTML;
+}
+
+function elegir(valor){
+decisiones.push(valor);
+fase++;
+
+if(fase<escenarios.length){
+mostrarFase();
+}else{
+evaluar();
+}
+}
+
+function evaluar(){
+
+document.getElementById("juego").classList.add("hidden");
+document.getElementById("final").classList.remove("hidden");
+
+let estructura=decisiones.filter(d=>d==="estructura").length;
+let expansion=decisiones.filter(d=>d==="expansion").length;
+let estabilidad=decisiones.filter(d=>d==="estabilidad").length;
+let riesgo=decisiones.filter(d=>d==="riesgo").length;
+
+let mensaje="";
+
+if(estructura>=2 && estabilidad>=1){
+mensaje="🏆 Estrategia estructural coherente. Construiste bases sólidas y gestionaste riesgos con visión de largo plazo.";
+}
+else if(expansion>=2 && riesgo>=1 && estructura===0){
+mensaje="❌ Estrategia oportunista. Priorizaste impacto y crecimiento sin fundamentos sólidos. El contrato fue adjudicado a un competidor más confiable.";
+}
+else if(expansion>=2){
+mensaje="⚠ Estrategia agresiva. Alto potencial de crecimiento, pero vulnerable ante crisis.";
+}
+else if(estabilidad>=2){
+mensaje="📊 Estrategia conservadora. Lograste estabilidad, pero con menor diferenciación competitiva.";
+}
+else{
+mensaje="❓ Estrategia inconsistente. Cambiaste de enfoque sin una línea clara de dirección.";
+}
+document.getElementById("resultado").textContent=mensaje;
+}
+</script>
+
+</body>
+</html>
