@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Simulación Estratégica de Juicio Civil</title>
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+padding:40px;
+background:#2cc739;
+}
+
+.caja{
+background:rgb(153, 161, 163);
+border:1px solid #ccc;
+padding:25px;
+width:70%;
+margin:auto;
+border-radius:8px;
+}
+
+button{
+display:block;
+margin:10px auto;
+padding:10px;
+font-size:16px;
+cursor:pointer;
+background:#1e3a5f;
+color:rgb(134, 223, 245);
+border:none;
+border-radius:5px;
+}
+
+button:hover{
+background:#2f5c8f;
+}
+
+button:disabled{
+background:gray;
+cursor:not-allowed;
+}
+
+#historial{
+margin-top:20px;
+text-align:left;
+border-top:1px solid black;
+padding-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="pantalla1">
+
+<h1>⚖️ Simulación Estratégica de Juicio Civil ⚖️<br><br> 
+"incumplimiento de contrato"</h1>
+
+<div class="caja">
+
+<label>Nombre del Abogado</label>
+<br><br>
+<input id="nombre" type="text" placeholder="Escribe tu nombre">
+<br><br>
+
+<button onclick="iniciar()">Iniciar simulación</button>
+
+<div id="juego" style="display:none">
+
+<h2>Recursos estratégicos disponibles</h2>
+<div id="recursos">100</div>
+
+<h2>Audiencia Preliminar</h2>
+
+<button onclick="decision(this,25,'Presentó contrato firmado como prueba principal',25)">
+Presentar contrato firmado (-25 recursos)
+</button>
+
+<button onclick="decision(this,20,'Ofreció testigos del acuerdo celebrado',20)">
+Presentar testigos (-20 recursos)
+</button>
+
+<button onclick="decision(this,10,'Solo realizó argumentación jurídica sin prueba documental',10)">
+Solo argumentar (-10 recursos)
+</button>
+
+<button onclick="decision(this,15,'Presentó documentos irrelevantes que debilitaron el caso',-10)">
+Presentar documentos irrelevantes (-15 recursos)
+</button>
+
+<button onclick="decision(this,10,'Intentó una estrategia procesal incorrecta',-15)">
+Estrategia procesal incorrecta (-10 recursos)
+</button>
+
+<h2>Audiencia de Juicio</h2>
+
+<button onclick="decision(this,20,'Ratificó documentos ante el juez',20)">
+Ratificar documentos (-20 recursos)
+</button>
+
+<button onclick="decision(this,15,'Logró debilitar la versión de la parte demandada mediante interrogatorio',15)">
+Interrogatorio estratégico (-15 recursos)
+</button>
+
+<button onclick="decision(this,10,'Intentó conciliación entre las partes',10)">
+Intentar conciliación (-10 recursos)
+</button>
+
+<button onclick="decision(this,10,'Interrogatorio confuso que favoreció a la contraparte',-15)">
+Interrogatorio mal formulado (-10 recursos)
+</button>
+
+<button onclick="decision(this,15,'Contradicción en los argumentos del actor',-20)">
+Contradicción en argumentos (-15 recursos)
+</button>
+
+<br>
+
+<button onclick="sentencia()">Dictar sentencia definitiva</button>
+
+<div id="historial">
+<h3>Decisiones tomadas:</h3>
+<ul id="lista"></ul>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="pantalla2" style="display:none">
+
+<h1>Sentencia Definitiva</h1>
+
+<div class="caja">
+
+<div id="resultado"></div>
+
+<br><br>
+
+<button onclick="location.reload()">Nueva simulación</button>
+
+</div>
+
+</div>
+
+<script>
+
+let recursos = 100
+let puntos = 0
+let jugador = ""
+let decisiones = []
+
+function iniciar(){
+
+jugador = document.getElementById("nombre").value
+
+if(jugador === ""){
+alert("Debes escribir tu nombre para iniciar.")
+return
+}
+
+document.getElementById("juego").style.display = "block"
+
+}
+
+function decision(boton,costo,texto,valor){
+
+if(recursos < costo){
+alert("No tienes recursos suficientes para esta estrategia.")
+return
+}
+
+recursos -= costo
+puntos += valor
+
+document.getElementById("recursos").innerText = recursos
+
+decisiones.push(texto)
+
+let lista = document.getElementById("lista")
+let item = document.createElement("li")
+item.innerText = texto
+lista.appendChild(item)
+
+boton.disabled = true
+
+}
+
+function sentencia(){
+
+document.getElementById("pantalla1").style.display = "none"
+document.getElementById("pantalla2").style.display = "block"
+
+let resultado = document.getElementById("resultado")
+
+let resumen = decisiones.join(", ")
+
+let puntuacionFinal = puntos
+let faltante = 100 - puntuacionFinal
+
+if(puntuacionFinal < 0){
+puntuacionFinal = 0
+}
+
+if(faltante < 0){
+faltante = 0
+}
+
+if(puntos >= 90){
+
+resultado.innerHTML =
+"⚖️ SENTENCIA DEFINITIVA ⚖️<br><br>" +
+"Este juzgado, tras analizar las actuaciones procesales realizadas por el abogando "+jugador+", determina que la estrategia jurídica fue adecuada y suficiente para acreditar la existencia de la obligación y su incumplimiento.<br><br>" +
+"Actuaciones relevantes: "+resumen+".<br><br>" +
+"Por lo anterior, se declara procedente la acción ejercitada y se condena a la parte demandada al cumplimiento de la obligación.<br><br>" +
+
+"<hr><br>" +
+
+"<b>Puntuación estratégica final:</b> "+puntuacionFinal+" / 100<br>" +
+"Para un litigio perfecto te faltaron: "+faltante+" puntos."
+
+}
+
+else if(puntos >= 70){
+
+resultado.innerHTML =
+"⚖️ SENTENCIA DEFINITIVA ⚖️<br><br>" +
+"El abogado "+jugador+" aportó algunos elementos probatorios dentro del proceso civil.<br><br>" +
+"Actuaciones realizadas: "+resumen+".<br><br>" +
+"No obstante, dichas pruebas no fueron suficientes para acreditar plenamente las pretensiones.<br><br>" +
+
+
+"<hr><br>" +
+
+"<b>Puntuación estratégica final:</b> "+puntuacionFinal+" / 100<br>" +
+"Para un litigio perfecto te faltaron: "+faltante+" puntos."
+
+}
+
+else{
+
+resultado.innerHTML =
+"⚖️ SENTENCIA DEFINITIVA ⚖️<br><br>" +
+"Del análisis del expediente se advierte que el abogado "+jugador+" no logró acreditar adecuadamente sus pretensiones.<br><br>" +
+"Actuaciones realizadas: "+resumen+".<br><br>" +
+"Se absuelve a la parte demandada.<br><br>" +
+
+"<hr><br>" +
+
+"<b>Puntuación estratégica final:</b> "+puntuacionFinal+" / 100<br>" +
+"Para un litigio perfecto te faltaron: "+faltante+" puntos."
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
